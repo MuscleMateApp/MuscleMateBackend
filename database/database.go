@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"musclemate/structs"
 
 	_ "github.com/lib/pq"
 )
@@ -146,4 +147,111 @@ func CreateTables() bool {
 	}
 
 	return true
+}
+
+func GetWorkout(workoutID int64) structs.Workout {
+	var workout structs.Workout
+
+	err := databaseConnection.QueryRow("SELECT workout_id, user_id, name, description, created_at FROM workouts WHERE workout_id = $1", workoutID).Scan(&workout.WorkoutID, &workout.UserID, &workout.Name, &workout.Description, &workout.CreatedAt)
+
+	if err != nil {
+		fmt.Println("Error getting workout by workout id:", err)
+		return workout
+	}
+
+	return workout
+}
+
+func CreateWorkout(userID int64, name string, description string) int64 {
+	var workoutID int64
+
+	err := databaseConnection.QueryRow("INSERT INTO workouts (user_id, name, description) VALUES ($1, $2, $3) RETURNING workout_id", userID, name, description).Scan(&workoutID)
+
+	if err != nil {
+		fmt.Println("Error creating workout:", err)
+		return 0
+	}
+
+	return workoutID
+}
+
+func UpdateWorkout(workoutID int64, name string, description string) bool {
+	_, err := databaseConnection.Exec("UPDATE workouts SET name = $1, description = $2 WHERE workout_id = $3", name, description, workoutID)
+
+	if err != nil {
+		fmt.Println("Error updating workout:", err)
+		return false
+	}
+
+	return true
+}
+
+func DeleteWorkout(workoutID int64) bool {
+	_, err := databaseConnection.Exec("DELETE FROM workouts WHERE workout_id = $1", workoutID)
+
+	if err != nil {
+		fmt.Println("Error deleting workout:", err)
+		return false
+	}
+
+	return true
+}
+
+func GetWorkouts(userID int64) []structs.Workout {
+	var workouts []structs.Workout
+
+	rows, err := databaseConnection.Query("SELECT workout_id, user_id, name, description, created_at FROM workouts WHERE user_id = $1", userID)
+	if err != nil {
+		fmt.Println("Error getting workouts by user id:", err)
+		return workouts
+	}
+
+	for rows.Next() {
+		var workout structs.Workout
+		err := rows.Scan(&workout.WorkoutID, &workout.UserID, &workout.Name, &workout.Description, &workout.CreatedAt)
+		if err != nil {
+			fmt.Println("Error scanning workout row:", err)
+			return workouts
+		}
+
+		workouts = append(workouts, workout)
+	}
+
+	return workouts
+}
+
+func GetExercises(workoutID int64) []structs.Exercise {
+	var exercises []structs.Exercise
+
+	rows, err := databaseConnection.Query("SELECT exercise_id, workout_id, name, sets, reps, weight, duration, video_url, created_at FROM exercises WHERE workout_id = $1", workoutID)
+	if err != nil {
+		fmt.Println("Error getting exercises by workout id:", err)
+		return exercises
+	}
+
+	for rows.Next() {
+		var exercise structs.Exercise
+		err := rows.Scan(&exercise.ExerciseID, &exercise.WorkoutID, &exercise.Name, &exercise.Sets, &exercise.Reps, &exercise.Weight, &exercise.Duration, &exercise.VideoURL, &exercise.CreatedAt)
+		if err != nil {
+			fmt.Println("Error scanning exercise row:", err)
+			return exercises
+		}
+
+		exercises = append(exercises, exercise)
+	}
+
+	return exercises
+}
+
+func GetExercise(exerciseID int64) structs.Exercise {
+	var exercise structs.Exercise
+
+	err := databaseConnection.QueryRow("SELECT exercise_id, workout_id, name, sets, reps, weight, duration, video_url, created_at FROM exercises WHERE exercise_id = $1", exerciseID).Scan(&exercise.ExerciseID, &exercise.WorkoutID, &exercise.Name, &exercise.Sets, &exercise.Reps, &exercise.Weight, &exercise.Duration, &exercise.VideoURL, &exercise.CreatedAt)
+
+	if err != nil {
+		fmt.Println("Error getting exercise by exercise id:", err)
+		return exercise
+	}
+
+	return exercise
 }

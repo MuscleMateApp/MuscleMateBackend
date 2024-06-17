@@ -19,11 +19,12 @@ type ErrorResponse struct {
 }
 
 type Workout struct {
-	WorkoutID   int    `json:"workout_id"`
-	UserID      int    `json:"user_id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CreatedAt   string `json:"created_at"`
+	WorkoutID   int        `json:"workout_id"`
+	UserID      int        `json:"user_id"`
+	Name        string     `json:"name"`
+	Exercise    []Exercise `json:"exercise"`
+	Description string     `json:"description"`
+	CreatedAt   string     `json:"created_at"`
 }
 
 type Exercise struct {

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"musclemate/database"
+	api "musclemate/endpoints"
 	"musclemate/utils/logger"
 	"net/http"
 	"os"
@@ -80,6 +81,10 @@ func rateLimitMiddleware(next http.HandlerFunc) http.HandlerFunc {
 func main() {
 	if database.Init() && database.CreateTables() {
 		logger.LogSuccess("[Database] Connected successfully!")
+
+		http.HandleFunc("/api/accounts", rateLimitMiddleware(api.HandleAccounts))
+		http.HandleFunc("/api/workouts", rateLimitMiddleware(api.HandleWorkouts))
+		http.HandleFunc("/api/exercises", rateLimitMiddleware(api.HandleExercises))
 	} else {
 		logger.LogWarning("[Database] Failed to connect!")
 		return

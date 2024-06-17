@@ -23,7 +23,6 @@ func Init() bool {
 }
 
 func CreateTables() bool {
-	// Create users table first
 	_, err := databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
 		id SERIAL PRIMARY KEY,
@@ -38,7 +37,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create workouts table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS workouts (
 		workout_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -53,7 +51,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create exercises table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS exercises (
 		exercise_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -72,7 +69,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create nutrition table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS nutrition (
 		nutrition_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -91,7 +87,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create progress table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS progress (
 		progress_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -109,7 +104,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create goals table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS goals (
 		goal_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -126,7 +120,6 @@ func CreateTables() bool {
 		return false
 	}
 
-	// Create analytics table
 	_, err = databaseConnection.Exec(`
 	CREATE TABLE IF NOT EXISTS analytics (
 		analytics_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -185,7 +178,7 @@ func UpdateWorkout(workoutID int64, name string, description string) bool {
 
 	return true
 }
-
+  
 func DeleteWorkout(workoutID int64) bool {
 	_, err := databaseConnection.Exec("DELETE FROM workouts WHERE workout_id = $1", workoutID)
 

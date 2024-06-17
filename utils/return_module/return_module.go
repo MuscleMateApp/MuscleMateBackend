@@ -86,3 +86,11 @@ func Success(w http.ResponseWriter) {
 	}
 	SendResponce(w, successResponse, http.StatusOK)
 }
+
+func WorkoutReturn(w http.ResponseWriter, workout structs.Workout) {
+	SendResponce(w, workout, http.StatusOK)
+}
+
+func WorkoutCreated(w http.ResponseWriter, workoutID int64) {
+	SendResponce(w, workoutID, http.StatusCreated)
+}

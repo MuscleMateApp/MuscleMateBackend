@@ -56,8 +56,8 @@ func CreateTables() bool {
 		exercise_id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 		workout_id BIGINT REFERENCES workouts(workout_id) NOT NULL,
 		name VARCHAR(100) NOT NULL,
-		sets INT,
 		reps INT,
+		sets INT,
 		weight DECIMAL(5,2),
 		duration INT, -- duration in seconds
 		video_url TEXT,
@@ -143,6 +143,7 @@ func CreateTables() bool {
 }
 
 func GetWorkout(workoutID int64) structs.Workout {
+	// should rerturn workout struct with all exercises structs for that workout
 	var workout structs.Workout
 
 	err := databaseConnection.QueryRow("SELECT workout_id, user_id, name, description, created_at FROM workouts WHERE workout_id = $1", workoutID).Scan(&workout.WorkoutID, &workout.UserID, &workout.Name, &workout.Description, &workout.CreatedAt)
@@ -152,7 +153,10 @@ func GetWorkout(workoutID int64) structs.Workout {
 		return workout
 	}
 
+	workout.Exercise = GetExercises(workoutID)
+
 	return workout
+
 }
 
 func CreateWorkout(userID int64, name string, description string) int64 {
@@ -168,6 +172,19 @@ func CreateWorkout(userID int64, name string, description string) int64 {
 	return workoutID
 }
 
+// add existing exercise to workout via workout id and exercise id
+
+func AddExerciseToWorkout(workoutID int64, exerciseID int64) bool {
+	_, err := databaseConnection.Exec("UPDATE exercises SET workout_id = $1 WHERE exercise_id = $2", workoutID, exerciseID)
+
+	if err != nil {
+		fmt.Println("Error adding exercise to workout:", err)
+		return false
+	}
+
+	return true
+}
+
 func UpdateWorkout(workoutID int64, name string, description string) bool {
 	_, err := databaseConnection.Exec("UPDATE workouts SET name = $1, description = $2 WHERE workout_id = $3", name, description, workoutID)
 
@@ -178,7 +195,7 @@ func UpdateWorkout(workoutID int64, name string, description string) bool {
 
 	return true
 }
-  
+
 func DeleteWorkout(workoutID int64) bool {
 	_, err := databaseConnection.Exec("DELETE FROM workouts WHERE workout_id = $1", workoutID)
 
@@ -247,4 +264,39 @@ func GetExercise(exerciseID int64) structs.Exercise {
 	}
 
 	return exercise
+}
+
+func CreateExercise(workoutID int64, name string, sets int, reps int, weight float64, duration int) int64 {
+	var exerciseID int64
+
+	err := databaseConnection.QueryRow("INSERT INTO exercises (workout_id, name, sets, reps, weight, duration, video_url) VALUES ($1, $2, $3, $4, $5, $6) RETURNING exercise_id", workoutID, name, sets, reps, weight, duration).Scan(&exerciseID)
+
+	if err != nil {
+		fmt.Println("Error creating exercise:", err)
+		return 0
+	}
+
+	return exerciseID
+}
+
+func UpdateExercise(exerciseID int64, name string, sets int, reps int, weight float64, duration int) bool {
+	_, err := databaseConnection.Exec("UPDATE exercises SET name = $1, sets = $2, reps = $3, weight = $4, duration = $5 WHERE exercise_id = $6", name, sets, reps, weight, duration, exerciseID)
+
+	if err != nil {
+		fmt.Println("Error updating exercise:", err)
+		return false
+	}
+
+	return true
+}
+
+func DeleteExercise(exerciseID int64) bool {
+	_, err := databaseConnection.Exec("DELETE FROM exercises WHERE exercise_id = $1", exerciseID)
+
+	if err != nil {
+		fmt.Println("Error deleting exercise:", err)
+		return false
+	}
+
+	return true
 }

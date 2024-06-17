@@ -129,3 +129,4 @@ func DeleteRequest(w http.ResponseWriter, r *http.Request) {
 
 	ReturnModule.Success(w)
 }
+

@@ -95,7 +95,7 @@ func PostRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exercise := database.CreateExercise(requestData.WorkoutID, requestData.Name, requestData.Sets, requestData.Reps, requestData.Weight, requestData.Duration)
+	exercise := database.CreateExercise(requestData.WorkoutID, requestData.Name, requestData.Sets, requestData.Reps, requestData.Weight, requestData.Duration, "")
 	ReturnModule.SendResponce(w, exercise, http.StatusOK)
 }
 
@@ -145,7 +145,7 @@ func PutRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exercise := database.UpdateExercise(requestData.ExerciseID, requestData.Name, requestData.Sets, requestData.Reps, requestData.Weight, requestData.Duration)
+	exercise := database.UpdateExercise(requestData.ExerciseID, requestData.Name, requestData.Sets, requestData.Reps, requestData.Weight, requestData.Duration, "")
 	ReturnModule.SendResponce(w, exercise, http.StatusOK)
 }
 
